@@ -1,8 +1,16 @@
-# Progressive Web Application Library (Lite Version)
+# Display Utility PWA Library
+
+**Depends on [js-message](https://github.com/SergioRando/js-message) Library**
 
 This is library for a fork project of [PWA](https://github.com/SergioRando/PWA)
 
-Full version can be found at [PWA Library](https://github.com/SergioRando/PWA-Library)
+Set of utility functions for display information and notifications
+
+exports **inch** - display inch size in pixels
+exports **density** - display pixel density (1.5 - for HD displays, 2 - for Retina displays)
+
+message **evShow** - when PWA window visible to user
+message **evHide** - when PWA window invisible to user
 
 # Template
 Read full installation process before executing any command
