@@ -17,7 +17,7 @@
 'use strict';
 
 import { MessagePool } from "./../../js-message/globals/message.js"
-import { bindOnDocumentReady } from "./../../../include/event.js"
+import { bindEvent, bindOnDocumentReady } from "./../../../include/event.js"
 
 // Visibility Detection
 
@@ -136,3 +136,64 @@ function detectScreen() {
 }
 
 bindOnDocumentReady(detectScreen);
+
+// Full Screen
+
+export const evFullScreen = 'evFullScreen';
+
+const classFullScreen = 'fullscreen';
+
+const sRequestFullscreen = 'requestFullscreen';
+const sMozRequestFullScreen = 'mozRequestFullScreen';
+const sWebkitRequestFullscreen = 'webkitRequestFullscreen';
+
+export function enterFullScreen(domTarget) {
+	if (domTarget[sRequestFullscreen]) {
+		domTarget[sRequestFullscreen]();
+	} else if (domTarget[sMozRequestFullScreen]) {
+		domTarget[sMozRequestFullScreen]();
+	} else if (domTarget[sWebkitRequestFullscreen]) {
+		domTarget[sWebkitRequestFullscreen](Element['ALLOW_KEYBOARD_INPUT']);
+	}
+}
+
+const sCancelFullScreen = 'cancelFullScreen';
+const sMozCancelFullScreen = 'mozCancelFullScreen';
+const sWebkitCancelFullScreen = 'webkitCancelFullScreen';
+
+export function exitFullScreen() {
+	if (platform.document[sCancelFullScreen]) {
+		platform.document[sCancelFullScreen]();
+	} else if (platform.document[sMozCancelFullScreen]) {
+		platform.document[sMozCancelFullScreen]();
+	} else if (platform.document[sWebkitCancelFullScreen]) {
+		platform.document[sWebkitCancelFullScreen]();
+	}
+}
+
+export function toggleFullScreen(domTarget) {
+	if (!platform.document['fullscreenElement'] && !platform.document['mozFullScreenElement'] && !platform.document['webkitFullscreenElement']) {
+		enterFullScreen(domTarget);
+	} else {
+		exitFullScreen();
+	}
+};
+
+/**
+ * @param {Event} oEvent 
+ */
+function onFullScreenChange(oEvent) {
+    let bState = platform.document['fullScreen'] || platform.document['mozFullScreen'] || platform.document['webkitIsFullScreen'];
+    let bFullScreen = bState ? true : false;
+    if (bState)
+		platform.document.body.classList.add(classFullScreen);
+    else
+		platform.document.body.classList.remove(classFullScreen);
+    
+	MessagePool.post(evFullScreen, oEvent.target, bFullScreen);
+}
+
+bindEvent(platform.document, 'webkitfullscreenchange', onFullScreenChange);
+bindEvent(platform.document, 'mozfullscreenchange', onFullScreenChange);
+bindEvent(platform.document, 'fullscreenchange', onFullScreenChange);
+bindEvent(platform.document, 'MSFullscreenChange', onFullScreenChange);
