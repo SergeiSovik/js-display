@@ -17,7 +17,7 @@
 'use strict';
 
 import { MessagePool } from "./../../js-message/globals/message.js"
-import { bindEvent, bindOnDocumentReady } from "./../../../include/event.js"
+import { bindEvent } from "./../../../include/event.js"
 
 // Visibility Detection
 
@@ -89,7 +89,7 @@ if (platform.document !== undefined) {
 export var inch = {fX: 100, fY: 100, fXh: 50, fYh: 50};
 
 /** @type {number} */ 
-export var density = 1;
+export var density = detectScreen();
 
 function calculateInch() {
 	if (platform.document === undefined) {
@@ -129,13 +129,13 @@ function detectScreen() {
 	calculateInch();
 	
 	if (isRetina()) {
-		density = 2;
+		return 2;
 	} else if (isHighDensity()) {
-		density = 1.5;
+		return 1.5;
 	}
+	
+	return 1;
 }
-
-bindOnDocumentReady(detectScreen);
 
 // Full Screen
 
