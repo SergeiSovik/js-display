@@ -114,7 +114,7 @@ function calculateInch() {
     inch.fXh = inch.fX / 2;
 	inch.fYh = inch.fY / 2;
 
-    console.log("Inch: " + inch.fX + " x " + inch.fY);
+    //console.log("Inch: " + inch.fX + " x " + inch.fY);
 }
 
 function isHighDensity(){
