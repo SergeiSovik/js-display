@@ -197,3 +197,10 @@ bindEvent(platform.document, 'webkitfullscreenchange', onFullScreenChange);
 bindEvent(platform.document, 'mozfullscreenchange', onFullScreenChange);
 bindEvent(platform.document, 'fullscreenchange', onFullScreenChange);
 bindEvent(platform.document, 'MSFullscreenChange', onFullScreenChange);
+
+// Scroll
+
+export function getWindowScrollY() {
+    let domDocument = document.documentElement;
+    return (window.pageYOffset || domDocument.scrollTop) - (domDocument.clientTop || 0);
+}
