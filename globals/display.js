@@ -84,37 +84,76 @@ if (platform.document !== undefined) {
  * 
  * fX - width / fY - height / fXh - half width / fYh - half height
  * 
- * @type {{fX: number, fY: number, fXh: number, fYh: number}}
+ * @type {{fX: number, fY: number, fXh: number, fYh: number, bFake: boolean}}
  */
-export var inch = {fX: 100, fY: 100, fXh: 50, fYh: 50};
+export var inch = {fX: 100, fY: 100, fXh: 50, fYh: 50, bFake: false};
 
 /** @type {number} */ 
 export var density = detectScreen();
 
 function calculateInch() {
+	let fFake = 96;
+
 	if (platform.document === undefined) {
 		inch.fX = inch.fY = 96;
 	} else {
-		let domDiv = platform.document.createElement("div");
+		let domBody = /** @type {HTMLElement} */ ( platform.document.body );
+
+		let domDiv = /** @type {HTMLElement} */ ( platform.document.createElement("div") );
 		domDiv.style.position = "fixed";
 		domDiv.style.left = "0px";
 		domDiv.style.top = "0px";
 		domDiv.style.width = "1in";
 		domDiv.style.height = "1in";
+		//domDiv.style.zIndex = "1000";
 		domDiv.style.overflow = "hidden";
 		domDiv.style.visibility = "hidden";
-		platform.document.body.appendChild(domDiv);
+		domBody.appendChild(domDiv);
 		
 		inch.fX = domDiv.clientWidth;
 		inch.fY = domDiv.clientHeight;
 	
-		platform.document.body.removeChild(domDiv);
+		domBody.removeChild(domDiv);
+
+		// Fake Desktop Mode Detection
+
+		let domFake = /** @type {HTMLElement} */ ( platform.document.createElement("div") );
+		domFake.style.width = "100%";
+		domFake.style.font = "normal 0.16in sans-serif";
+		domFake.style.lineHeight = "0.16in";
+		domFake.style.visibility = "hidden";
+		//domFake.style.color = "#fff";
+		//domFake.style.zIndex = "1000";
+		let domFakeCheck = /** @type {HTMLElement} */ ( domFake.appendChild(platform.document.createElement("div")) );
+		domFakeCheck.innerHTML = "0";
+		let domFakeDetector = /** @type {HTMLElement} */ ( domFake.appendChild(platform.document.createElement("div")) );
+		domFakeDetector.innerHTML = new Array(1024).join('0'); // Long text for bug reproduction
+
+		domBody.insertBefore(domFake, domBody.childNodes[0]);
+
+		fFake = Math.round(domFakeCheck.clientHeight / 0.16);
+
+		domBody.removeChild(domFake);
 	}
 	
+
+	let fRatio = fFake / inch.fY;
+	if ((fRatio > 0) && (fRatio < 1)) fRatio = 1/fRatio;
+	if (fRatio > 0) fRatio -= 1;
+
+	if (fRatio > 0.5) {
+		inch.fX = fFake;
+		inch.fY = fFake;
+
+		inch.bFake = true;
+	}
+
+	console.log("Fake Ratio: " + fRatio);
+
     inch.fXh = inch.fX / 2;
 	inch.fYh = inch.fY / 2;
 
-    //console.log("Inch: " + inch.fX + " x " + inch.fY);
+    console.log("Inch: " + inch.fX + " x " + inch.fY);
 }
 
 function isHighDensity(){
